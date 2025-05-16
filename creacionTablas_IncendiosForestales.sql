@@ -35,8 +35,8 @@ CREATE TABLE IncendiosForestales (
     ts_inicio TIMESTAMP,
     nombre_bosque TEXT,
     ts_fin TIMESTAMP,
-    estacion TEXT,
-    hect_quemadas NUMERIC,
+    estacion TEXT CHECK (estación IN ('verano', 'otoño', 'invierno', 'primavera')),
+    hect_quemadas NUMERIC CHECK (hect_quemadas >= 0),
     latitud_inicio NUMERIC,
     longitud_inicio NUMERIC,
     PRIMARY KEY (ts_inicio, nombre_bosque),
@@ -61,7 +61,7 @@ CREATE TABLE IndicesGLI (
 CREATE TABLE IndicesSAVI (
     fecha DATE,
     nombre_bosque TEXT,
-    valor_savi NUMERIC,
+    valor_savi NUMERIC CHECK (valor_savi>=0 and valor_savi<=1),
     PRIMARY KEY (fecha, nombre_bosque),
     FOREIGN KEY (nombre_bosque) REFERENCES Bosques(nombre)
 );
@@ -99,9 +99,9 @@ CREATE TABLE InformesMetereologicos (
     nombre_estacionMetereologica TEXT,
     dir_viento TEXT,
     vel_viento NUMERIC,
-    precipitacion_6h NUMERIC,
-    precipitacion12_h NUMERIC,
-    humedad NUMERIC,
+    precipitacion_6h NUMERIC CHECK (precipitacion_6h >= 0),
+    precipitacion12_h NUMERIC CHECK (precipitacion12_h >= 0),
+    humedad NUMERIC CHECK (humedad BETWEEN 0 AND 100),
     temperatura NUMERIC,
     PRIMARY KEY (timestamp, nombre_estacionMetereologica),
     FOREIGN KEY (nombre_estacionMetereologica) REFERENCES EstacionesMetereologicas(nombre)
@@ -130,8 +130,8 @@ CREATE TABLE ComportamientosIncendios (
 CREATE TABLE Bomberos (
     nro_brigada INTEGER PRIMARY KEY,
     nombre_partido TEXT,
-    tipo TEXT,
-    cantidad_bomberos INTEGER,
+    tipo TEXT NOT NULL CHECK (tipo IN ('oficial', 'voluntario')),
+    cantidad_bomberos INTEGER (cantidad_bomberos >= 0),
     FOREIGN KEY (nombre_partido) REFERENCES Partidos(nombre)
 );
 
@@ -148,7 +148,7 @@ CREATE TABLE BomberosEnIncendios (
 -- Tabla Recursos
 CREATE TABLE Recursos (
     nombre TEXT PRIMARY KEY,
-    tipo TEXT,
+    tipo TEXT CHECK (tipo IN ('humano', 'material')),
     descripcion TEXT
 );
 
@@ -182,7 +182,7 @@ CREATE TABLE TacticasUtilizadasEnIncendios (
 -- Tabla Causas
 CREATE TABLE Causas (
     nombre TEXT PRIMARY KEY,
-    tipo TEXT,
+    tipo TEXT CHECK (tipo in ('artificial', 'natural'),
     descripcion TEXT
 );
 
