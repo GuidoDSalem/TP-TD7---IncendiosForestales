@@ -35,7 +35,7 @@ CREATE TABLE IncendiosForestales (
     ts_inicio TIMESTAMP,
     nombre_bosque TEXT,
     ts_fin TIMESTAMP,
-    estacion TEXT CHECK (estación IN ('verano', 'otoño', 'invierno', 'primavera')),
+    estacion TEXT CHECK (estacion IN ('verano', 'otoño', 'invierno', 'primavera')),
     hect_quemadas NUMERIC CHECK (hect_quemadas >= 0),
     latitud_inicio NUMERIC,
     longitud_inicio NUMERIC,
@@ -131,7 +131,7 @@ CREATE TABLE Bomberos (
     nro_brigada INTEGER PRIMARY KEY,
     nombre_partido TEXT,
     tipo TEXT NOT NULL CHECK (tipo IN ('oficial', 'voluntario')),
-    cantidad_bomberos INTEGER (cantidad_bomberos >= 0),
+    cantidad_bomberos INTEGER CHECK (cantidad_bomberos >= 0),
     FOREIGN KEY (nombre_partido) REFERENCES Partidos(nombre)
 );
 
@@ -182,7 +182,7 @@ CREATE TABLE TacticasUtilizadasEnIncendios (
 -- Tabla Causas
 CREATE TABLE Causas (
     nombre TEXT PRIMARY KEY,
-    tipo TEXT CHECK (tipo in ('artificial', 'natural'),
+    tipo TEXT CHECK (tipo in ('artificial', 'natural')),
     descripcion TEXT
 );
 
