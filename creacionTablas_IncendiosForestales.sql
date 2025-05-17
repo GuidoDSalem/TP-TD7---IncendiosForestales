@@ -1,14 +1,14 @@
 -- Tabla Bosques
 CREATE TABLE Bosques (
     nombre TEXT PRIMARY KEY,
-    superficie NUMERIC
+    superficie numeric check (superficie >= 0),
 );
 
 -- Tabla AfluenciasTuristicas
 CREATE TABLE AfluenciasTuristicas (
-    fecha DATE,
+    fecha DATE check (fecha <= CURRENT_DATE),
     nombre_bosque TEXT,
-    cant_turistas INTEGER,
+    cant_turistas INTEGER check (cant_turistas >= 0),
     PRIMARY KEY (fecha, nombre_bosque),
     FOREIGN KEY (nombre_bosque) REFERENCES Bosques(nombre)
 );
@@ -32,9 +32,9 @@ CREATE TABLE Coordenadas (
 
 -- Tabla IncendiosForestales
 CREATE TABLE IncendiosForestales (
-    ts_inicio TIMESTAMP,
+    ts_inicio TIMESTAMP check (ts_inicio <= CURRENT_DATE),
     nombre_bosque TEXT,
-    ts_fin TIMESTAMP,
+    ts_fin TIMESTAMP check (ts_fin > ts_inicio),
     estacion TEXT CHECK (estacion IN ('verano', 'otoño', 'invierno', 'primavera')),
     hect_quemadas NUMERIC CHECK (hect_quemadas >= 0),
     latitud_inicio NUMERIC,
@@ -47,19 +47,19 @@ CREATE TABLE IncendiosForestales (
 
 -- Tabla IndicesGLI
 CREATE TABLE IndicesGLI (
-    fecha DATE,
+    fecha DATE check (fecha <= CURRENT_DATE),
     nombre_bosque TEXT,
-    valor_gli NUMERIC,
-    valor_rojo NUMERIC,
-    valor_azul NUMERIC,
-    valor_verde NUMERIC,
+    valor_gli numeric CHECK (valor_gli>=-1 and valor_gli<=1),
+    valor_rojo numeric CHECK (valor_rojo>=0 and valor_rojo<=255),
+    valor_azul numeric CHECK (valor_azul>=0 and valor_azul<=255),
+    valor_verde numeric CHECK (valor_verde>=0 and valor_verde<=255),
     PRIMARY KEY (fecha, nombre_bosque),
     FOREIGN KEY (nombre_bosque) REFERENCES Bosques(nombre)
 );
 
 -- Tabla IndicesSAVI
 CREATE TABLE IndicesSAVI (
-    fecha DATE,
+    fecha DATE check (fecha <= CURRENT_DATE),
     nombre_bosque TEXT,
     valor_savi NUMERIC CHECK (valor_savi>=0 and valor_savi<=1),
     PRIMARY KEY (fecha, nombre_bosque),
@@ -69,8 +69,8 @@ CREATE TABLE IndicesSAVI (
 -- Tabla Partidos
 CREATE TABLE Partidos (
     nombre TEXT PRIMARY KEY,
-    densidad_poblacional NUMERIC,
-    superficie_total NUMERIC
+    densidad_poblacional numeric check (densidad_poblacional >= 0),
+    superficie_total numeric check (superficie_total >= 0),
 );
 
 -- Tabla BosquesEnPartidos
@@ -95,7 +95,7 @@ CREATE TABLE EstacionesMetereologicas (
 
 -- Tabla InformesMetereológicos
 CREATE TABLE InformesMetereologicos (
-    timestamp TIMESTAMP,
+    timestamp TIMESTAMP check (timestamp <= CURRENT_DATE),
     nombre_estacionMetereologica TEXT,
     dir_viento TEXT,
     vel_viento NUMERIC,
