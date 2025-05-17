@@ -1,7 +1,7 @@
 -- Tabla Bosques
 CREATE TABLE Bosques (
     nombre TEXT PRIMARY KEY,
-    superficie numeric check (superficie >= 0),
+    superficie numeric CHECK (superficie >= 0)
 );
 
 -- Tabla AfluenciasTuristicas
@@ -50,9 +50,9 @@ CREATE TABLE IndicesGLI (
     fecha DATE check (fecha <= CURRENT_DATE),
     nombre_bosque TEXT,
     valor_gli numeric CHECK (valor_gli>=-1 and valor_gli<=1),
-    valor_rojo numeric CHECK (valor_rojo>=0 and valor_rojo<=255),
-    valor_azul numeric CHECK (valor_azul>=0 and valor_azul<=255),
-    valor_verde numeric CHECK (valor_verde>=0 and valor_verde<=255),
+    valor_rojo numeric CHECK (valor_rojo>=0 and valor_rojo<=1),
+    valor_azul numeric CHECK (valor_azul>=0 and valor_azul<=1),
+    valor_verde numeric CHECK (valor_verde>=0 and valor_verde<=1),
     PRIMARY KEY (fecha, nombre_bosque),
     FOREIGN KEY (nombre_bosque) REFERENCES Bosques(nombre)
 );
@@ -70,7 +70,7 @@ CREATE TABLE IndicesSAVI (
 CREATE TABLE Partidos (
     nombre TEXT PRIMARY KEY,
     densidad_poblacional numeric check (densidad_poblacional >= 0),
-    superficie_total numeric check (superficie_total >= 0),
+    superficie_total numeric check (superficie_total >= 0)
 );
 
 -- Tabla BosquesEnPartidos
