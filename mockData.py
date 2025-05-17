@@ -143,8 +143,6 @@ def insertar_datos(conn):
         conn.commit()
         
 
-
-
 def verificar_conexion(config):
     try:
         conn = psycopg2.connect(**config)
@@ -154,23 +152,62 @@ def verificar_conexion(config):
         print(f"❌ No se pudo conectar: {e}")
         return False
 
+def vaciar_todas_las_tablas(conn):
+    with conn.cursor() as cur:
+        tablas = [
+            "TacticasUtilizadasEnIncendio", "Tacticas", "RecursosUtilizadosEnIncendio", "Recursos",
+            "BomberosIncendio", "Bomberos", "ComportamientosIncendio", "IncendiosForestales",
+            "InformesMetereologicos", "EstacionesMetereologicas", "BosquesEnPartidos",
+            "IndicesGLI", "IndicesSAVI", "IndicesVegetacion", "Coordenadas", "Poligonos",
+            "Partidos", "bosques"
+        ]
+        for tabla in tablas:
+            cur.execute(f"DROP TABLE public.{tabla.lower()} CASCADE;")
+        conn.commit()
+    print("🧹 Todas las tablas han sido vaciadas.")
+
 # ----------------------------
 # Ejecución
 # ----------------------------
 if __name__ == "__main__":
+    print("Inicio del programa")
+    
     VACIAR = True
+    ELIMINAR = True
+    INGRESAR = False
+    
+    
     try:
         with psycopg2.connect(**DB_CONFIG) as conn:
             conexion = verificar_conexion(DB_CONFIG)
             if conexion:
                 print("CONEXIO  EXITOSA")
-                if VACIAR:
-                    vaciar_tablas(conn)
-                    print("✅ Tablas vaciadas correctamente.")
-                insertar_datos(conn)
-                print("✅ Datos insertados correctamente.")
             else:
                 print("ERROR - no se pudo conectar al DDBB")
-            
     except Exception as e:
         print(f"💥 Error: {e}")
+        
+    if VACIAR:
+        try:
+            with psycopg2.connect(**DB_CONFIG) as conn:
+                print("🧹 Vaciando tablas...")
+                vaciar_todas_las_tablas(conn)
+        except Exception as e:
+            print(f"💥 Error: {e}")
+            
+    if ELIMINAR:
+        try:
+            with psycopg2.connect(**DB_CONFIG) as conn:
+                vaciar_todas_las_tablas(conn)
+        except Exception as e:
+            print(f"💥 Error: {e}")
+            
+    if INGRESAR:
+        try:
+            with psycopg2.connect(**DB_CONFIG) as conn:
+                insertar_datos(conn)
+                print("✅ Datos insertados correctamente.")
+        except Exception as e:
+            print(f"💥 Error: {e}")
+        
+        
