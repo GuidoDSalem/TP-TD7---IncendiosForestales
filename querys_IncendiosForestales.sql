@@ -16,6 +16,48 @@ GROUP BY i.nombre_bosque
 ORDER BY total_quemado DESC;
 
 --Promedio bomberos usados en cada incendio
+SELECT AVG(b.cantidad_bomberos)
+FROM bomberos b INNER JOIN bomberosenincendios bi ON (b.nro_brigada = bi.nro_brigada);
+
+--Cantidad de incendios de cada tipo de causa
+SELECT c.tipo, COUNT(ci.inicio_incendio) AS cantidad_incendios
+FROM causasincendios ci INNER JOIN causas c ON (ci.nombre_causa = c.nombre)
+GROUP BY c.tipo;
+
+--Incendios más extensos por bosque
+SELECT nombre_bosque, ts_inicio, hect_quemadas,
+  RANK() OVER (PARTITION BY nombre_bosque ORDER BY hect_quemadas DESC) AS ranking_incendio
+FROM incendiosforestales;
+
+--Cantidad de recurso utilizado en incendios ocurridos en verano
+SELECT i.nombre_bosque, ru.nombre_recurso, count(ru.nombre_recurso)
+FROM recursosutilizadosenincendios ru INNER JOIN incendiosforestales i ON (ru.nombre_bosque = i.nombre_bosque and ru.inicio_incendio = i.ts_inicio)
+WHERE i.estacion = 'verano'
+GROUP BY i.nombre_bosque, ru.nombre_recurso;
+
+--Indice savi por bosque promedio luego de incendios
+SELECT i.nombre_bosque, AVG(idxs.valor_savi)
+FROM indicessavi idxs INNER JOIN incendiosforestales i ON (idxs.nombre_bosque = i.nombre_bosque)
+		INNER JOIN incendiosforestales i2 ON (idxs.nombre_bosque = i2.nombre_bosque)
+WHERE i.ts_fin < i2.ts_inicio and idxs.fecha > i.ts_fin and idxs.fecha < i2.ts_inicio
+GROUP BY i.nombre_bosque;
+
+--Incendios con más superficie quemada que el mayor incendio del bosque nro 2 en ranking de superficie total quemada
+WITH bosque_mas_afectado as (
+	SELECT i.nombre_bosque
+	FROM incendiosforestales i
+	GROUP BY i.nombre_bosque
+	ORDER BY SUM(i.hect_quemadas) DESC
+	OFFSET 1 ROWS FETCH FIRST 1 ROWS ONLY
+)
+SELECT nombre_bosque, ts_inicio, hect_quemadas
+FROM incendiosforestales
+WHERE hect_quemadas > ALL (
+	SELECT hect_quemadas
+	FROM incendiosforestales
+	WHERE nombre_bosque = (SELECT nombre_bosque FROM bosque_mas_afectado)
+);
+
 
 --Clasificación de incendios según su intensidad potencial
 WITH estadisticasfuego AS (
